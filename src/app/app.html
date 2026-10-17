@@ -1,0 +1,105 @@
+<div class="min-h-screen flex flex-col">
+  <!-- Header -->
+  <header class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16 items-center">
+        
+        <!-- Logo -->
+        <a routerLink="/" aria-label="FinCalcPro home" class="flex-shrink-0 flex items-center gap-2 transition-transform hover:scale-[1.02]">
+          <svg class="h-8 w-8 text-blue-600 drop-shadow-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+          </svg>
+          <span class="font-bold text-xl text-slate-800 tracking-tight">FinCalc<span class="text-blue-600">Pro</span></span>
+        </a>
+        
+        <!-- Dropdown Menu Container -->
+        <div class="relative">
+          <button (click)="toggleMenu()" [attr.aria-expanded]="isMenuOpen()" aria-haspopup="true" class="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-medium transition-colors cursor-pointer border border-slate-200 shadow-sm min-w-[160px] justify-between">
+            <span class="truncate">{{ activeCalcName() }}</span>
+            <svg class="w-4 h-4 transition-transform duration-200 text-slate-500 flex-shrink-0" [class.rotate-180]="isMenuOpen()" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          
+          <!-- Dropdown Panel -->
+          @if (isMenuOpen()) {
+            <!-- Invisible backdrop to close on click outside -->
+            <div class="fixed inset-0 z-10" (click)="closeMenu()"></div>
+            
+            <div class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-slate-100 z-20 py-2 max-h-[80vh] overflow-y-auto">
+              
+              <!-- Loans Category -->
+              <div class="px-4 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider">Loans</div>
+              @for (calc of calculators; track calc.route) {
+                @if (calc.category === 'Loans') {
+                  <a [routerLink]="calc.route" (click)="selectCalc(calc.name)" routerLinkActive="bg-blue-50 text-blue-700 font-semibold border-l-2 border-blue-500" class="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 transition-colors border-l-2 border-transparent cursor-pointer">
+                    {{ calc.name }}
+                  </a>
+                }
+              }
+              
+              <!-- Investments Category -->
+              <div class="px-4 py-2 mt-2 border-t border-slate-50 text-xs font-bold text-slate-400 uppercase tracking-wider pt-3">Investments</div>
+              @for (calc of calculators; track calc.route) {
+                @if (calc.category === 'Investments') {
+                  <a [routerLink]="calc.route" (click)="selectCalc(calc.name)" routerLinkActive="bg-blue-50 text-blue-700 font-semibold border-l-2 border-blue-500" class="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 transition-colors border-l-2 border-transparent cursor-pointer">
+                    {{ calc.name }}
+                  </a>
+                }
+              }
+              
+              <!-- Finance Category -->
+              <div class="px-4 py-2 mt-2 border-t border-slate-50 text-xs font-bold text-slate-400 uppercase tracking-wider pt-3">Salary & Finance</div>
+              @for (calc of calculators; track calc.route) {
+                @if (calc.category === 'Finance') {
+                  <a [routerLink]="calc.route" (click)="selectCalc(calc.name)" routerLinkActive="bg-blue-50 text-blue-700 font-semibold border-l-2 border-blue-500" class="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 transition-colors border-l-2 border-transparent cursor-pointer">
+                    {{ calc.name }}
+                  </a>
+                }
+              }
+
+            </div>
+          }
+        </div>
+        
+      </div>
+    </div>
+  </header>
+
+  <!-- Top Ad Slot -->
+  <div class="w-full bg-slate-100 py-4 flex justify-center border-b border-slate-200">
+    <div class="w-[320px] h-[50px] md:w-[728px] md:h-[90px] bg-slate-200 border border-dashed border-slate-300 flex items-center justify-center text-slate-400 text-sm">
+      Ad Slot: Top Banner
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex flex-col xl:flex-row gap-8">
+    
+    <!-- Router Outlet for Child Calculators -->
+    <div class="flex-1 min-w-0">
+      <router-outlet></router-outlet>
+    </div>
+
+    <!-- Right Sidebar Ad Slot -->
+    <div class="hidden xl:block w-[300px] shrink-0">
+      <div class="sticky top-24">
+        <div class="w-[300px] h-[600px] bg-slate-200 border border-dashed border-slate-300 flex items-center justify-center text-slate-400 text-sm">
+          Ad Slot: Sidebar (300x600)
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom / Mobile Anchor Ad -->
+  <div class="w-full bg-slate-100 py-3 flex justify-center border-t border-slate-200 text-xs text-slate-500">
+    <div class="w-[320px] h-[50px] bg-slate-200 border border-dashed border-slate-300 flex items-center justify-center text-slate-400">
+      Ad Slot: Sticky Bottom
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-white py-6 border-t border-slate-200 text-center">
+    <p class="text-sm text-slate-500">© 2026 FinCalc Pro. Information provided for educational purposes only.</p>
+  </footer>
+</div>

@@ -1,0 +1,129 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { SliderInputComponent } from '../../components/slider-input.component';
+import { ResultCardComponent } from '../../components/result-card.component';
+import { SplitSummaryComponent, SplitPart } from '../../components/split-summary.component';
+import { ChartCardComponent } from '../../components/chart-card.component';
+import { InsightComponent } from '../../components/insight.component';
+import { CountUpComponent } from '../../components/count-up.component';
+import { ChartSeries } from '../../components/chart-wrapper.component';
+import { CalculatorEngineService } from '../../services/calculator-engine.service';
+import { SeoService } from '../../services/seo.service';
+import { formatIndian } from '../../shared/format';
+import { INVESTED_COLOR, RETURNS_COLOR, RETURNS_TEXT, doublingYears, growthChart } from '../../shared/growth';
+
+@Component({
+  selector: 'app-lumpsum',
+  standalone: true,
+  imports: [CommonModule, SliderInputComponent, ResultCardComponent, SplitSummaryComponent, ChartCardComponent, InsightComponent, CountUpComponent],
+  template: `
+    <div class="flex flex-col lg:flex-row gap-8">
+      <!-- Input Section -->
+      <div class="w-full lg:w-1/2 p-6 bg-white rounded-xl shadow-sm border border-slate-100">
+        <h2 class="text-2xl font-bold text-slate-800 mb-1">Lumpsum Calculator</h2>
+        <p class="text-sm text-slate-500 mb-6">See what a one-time investment could grow to over time.</p>
+
+        <app-slider-input
+          label="Total Investment"
+          [min]="500" [max]="10000000" [step]="500"
+          [value]="principal"
+          (valueChange)="principal = $event; calculate()"
+          prefix="₹"
+        ></app-slider-input>
+
+        <app-slider-input
+          label="Expected Return Rate (p.a.)"
+          [min]="1" [max]="30" [step]="0.1"
+          [value]="rate"
+          (valueChange)="rate = $event; calculate()"
+          suffix="%"
+        ></app-slider-input>
+
+        <app-slider-input
+          label="Time Period"
+          [min]="1" [max]="40" [step]="1"
+          [value]="years"
+          (valueChange)="years = $event; calculate()"
+          suffix="years"
+        ></app-slider-input>
+      </div>
+
+      <!-- Result Section -->
+      <div class="w-full lg:w-1/2">
+        <app-result-card title="Investment Summary">
+          <div>
+            <p class="text-sm text-slate-500 font-medium uppercase tracking-wider mb-1">Maturity Value</p>
+            <p class="text-4xl sm:text-5xl font-bold text-blue-600"><app-count-up [value]="results.totalValue" prefix="₹" /></p>
+            <p class="text-sm text-slate-500 mt-1">from ₹{{ fmt(principal) }} invested once, after {{ years }} year{{ years > 1 ? 's' : '' }}</p>
+          </div>
+
+          <app-split-summary [parts]="parts" totalLabel="Maturity Value"></app-split-summary>
+
+          <app-insight tone="green">
+            Your investment grows <strong>{{ multiple }}×</strong>. At {{ rate }}% a year, money doubles about every <strong>{{ doubling }} years</strong>.
+          </app-insight>
+        </app-result-card>
+      </div>
+    </div>
+
+    <app-chart-card
+      title="Year-wise Growth"
+      subtitle="Your investment and the returns it has earned at the end of each year."
+      [labels]="chartLabels"
+      [series]="chartSeries"
+      [stacked]="true"
+    ></app-chart-card>
+
+    <!-- SEO FAQ Section -->
+    <div class="mt-12 p-8 bg-white rounded-xl shadow-sm border border-slate-100">
+      <h3 class="text-xl font-bold text-slate-800 mb-4">What is a Lumpsum Investment?</h3>
+      <p class="text-slate-600 mb-4 text-sm leading-relaxed">
+        A Lumpsum investment is a single bulk payment made into a financial asset (like equity, mutual funds, or bonds). It is preferred by investors who have significant cash on hand to generate long-term compounding growth.
+      </p>
+    </div>
+  `
+})
+export class LumpsumComponent implements OnInit {
+  principal = 100000;
+  rate = 12;
+  years = 10;
+
+  results = { investedAmount: 0, estimatedReturns: 0, totalValue: 0 };
+  parts: SplitPart[] = [];
+  multiple = '';
+  doubling = '';
+  chartLabels: string[] = [];
+  chartSeries: ChartSeries[] = [];
+
+  readonly fmt = formatIndian;
+
+  constructor(
+    private calculator: CalculatorEngineService,
+    private seo: SeoService
+  ) {}
+
+  ngOnInit() {
+    this.seo.updateSeoTags(
+      'Mutual Fund Lumpsum Calculator',
+      'Calculate the future value of your one-time lumpsum investments with compounding interest.',
+      'Lumpsum calculator, mutual fund lump sum return, compound interest investment'
+    );
+    this.calculate();
+  }
+
+  calculate() {
+    this.results = this.calculator.calculateLumpsum(this.principal, this.rate, this.years);
+    this.parts = [
+      { label: 'Invested', value: this.results.investedAmount, color: INVESTED_COLOR },
+      { label: 'Est. Returns', value: this.results.estimatedReturns, color: RETURNS_COLOR, textColor: RETURNS_TEXT }
+    ];
+    this.multiple = (this.results.totalValue / this.principal).toFixed(2);
+    this.doubling = doublingYears(this.rate).toFixed(1);
+
+    const points = [];
+    for (let y = 1; y <= this.years; y++) {
+      points.push({ label: `Yr ${y}`, invested: this.principal, value: this.calculator.calculateLumpsum(this.principal, this.rate, y).totalValue });
+    }
+    ({ labels: this.chartLabels, series: this.chartSeries } = growthChart(points));
+  }
+}
