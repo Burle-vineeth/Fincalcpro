@@ -11,6 +11,7 @@ import { CountUpComponent } from '../../components/count-up.component';
 import { SplitSummaryComponent, SplitPart } from '../../components/split-summary.component';
 import { ChartCardComponent } from '../../components/chart-card.component';
 import { InsightComponent } from '../../components/insight.component';
+import { AdSlotComponent } from '../../components/ad-slot.component';
 
 type LoanType = 'home' | 'car' | 'personal';
 
@@ -24,7 +25,7 @@ const LOAN_PRESETS: Record<LoanType, { principal: number, rate: number, tenure: 
 @Component({
   selector: 'app-emi',
   standalone: true,
-  imports: [CommonModule, SliderInputComponent, ResultCardComponent, AmortizationTableComponent, SegmentedControlComponent, SplitSummaryComponent, ChartCardComponent, InsightComponent, CountUpComponent],
+  imports: [AdSlotComponent, CommonModule, SliderInputComponent, ResultCardComponent, AmortizationTableComponent, SegmentedControlComponent, SplitSummaryComponent, ChartCardComponent, InsightComponent, CountUpComponent],
   template: `
     <div class="flex flex-col lg:flex-row gap-8">
       <!-- Input Section -->
@@ -122,6 +123,9 @@ const LOAN_PRESETS: Record<LoanType, { principal: number, rate: number, tenure: 
       <app-amortization-table [schedule]="schedule"></app-amortization-table>
     </div>
 
+    <!-- In-content ad, after the results and before the FAQ -->
+    <app-ad-slot placement="inContent" class="block mt-12" />
+
     <!-- SEO FAQ Section -->
     <div class="mt-12 p-8 bg-white rounded-xl shadow-sm border border-slate-100">
       <h3 class="text-xl font-bold text-slate-800 mb-4">What is an EMI?</h3>
@@ -136,13 +140,6 @@ const LOAN_PRESETS: Record<LoanType, { principal: number, rate: number, tenure: 
         <strong>R</strong> is the rate of interest calculated on a monthly basis.<br>
         <strong>N</strong> is the loan tenure in months.
       </p>
-
-      <!-- Ad Slot in Content -->
-      <div class="mt-8 w-full bg-slate-50 py-4 flex justify-center border border-dashed border-slate-300 text-xs text-slate-500">
-        <div class="w-[320px] h-[50px] md:w-[728px] md:h-[90px] flex items-center justify-center">
-          Ad Slot: In-Content Banner
-        </div>
-      </div>
     </div>
   `
 })

@@ -44,7 +44,8 @@ describe('CalculatorEngineService – loans', () => {
       ['two prepayments, reduce tenure', 5000000, 8.5, 240, [{ month: 12, amount: 500000 }, { month: 36, amount: 300000 }], 'reduceTenure', { savings: 2145686, newTenure: 173, newEmi: 43391.16 }],
       ['two prepayments, reduce EMI', 5000000, 8.5, 240, [{ month: 12, amount: 500000 }, { month: 36, amount: 300000 }], 'reduceEmi', { savings: 777523, newTenure: 240, newEmi: 36179.06 }],
       ['month 0 prepayment, reduce tenure', 1000000, 9, 120, [{ month: 0, amount: 200000 }], 'reduceTenure', { savings: 232056, newTenure: 86, newEmi: 12667.58 }],
-      ['month 0 prepayment, reduce EMI', 1000000, 9, 120, [{ month: 0, amount: 200000 }], 'reduceEmi', { savings: 104022, newTenure: 120, newEmi: 10134.06 }],
+      ['month 0 prepayment, reduce EMI', 1000000, 9, 120, [{ month: 0, amount: 200000 }], 'reduceEmi', { savings: 105327, newTenure: 120, newEmi: 10101.80 }],
+      ['month 0 prepayment, reduce EMI (next EMI unchanged)', 2000000, 8.5, 36, [{ month: 0, amount: 200000 }], 'reduceEmi', { savings: 28123, newTenure: 36, newEmi: 56617.26 }],
       ['two prepayments in the same month', 1000000, 9, 120, [{ month: 6, amount: 50000 }, { month: 6, amount: 50000 }], 'reduceTenure', { savings: 120299, newTenure: 103, newEmi: 12667.58 }],
       ['prepayment exceeds balance, reduce tenure', 100000, 8.5, 24, [{ month: 12, amount: 90000 }], 'reduceTenure', { savings: 2431, newTenure: 12, newEmi: 4545.57 }],
       ['prepayment exceeds balance, reduce EMI', 100000, 8.5, 24, [{ month: 12, amount: 90000 }], 'reduceEmi', { savings: 2431, newTenure: 12, newEmi: 4545.57 }],
@@ -182,14 +183,26 @@ describe('CalculatorEngineService – schedule edge cases', () => {
     expect(schedule.map(r => [r.date.getFullYear(), r.date.getMonth()])).toEqual([[2027, 1], [2027, 2], [2027, 3], [2027, 4]]);
   });
 
+  it('can lower the very next EMI after a month 0 reduce-EMI prepayment', () => {
+    const r = engine.calculatePrepayment(2000000, 8.5, 36, [{ month: 0, amount: 200000 }], 'reduceEmi', true);
+    expect(r.newEmi).toBeCloseTo(56821.57, 2);
+    expect(Math.round(r.savings)).toBe(27286);
+    const schedule = engine.generateAmortizationSchedule(2000000, 8.5, 36, new Date(), [{ month: 0, amount: 200000 }], 'reduceEmi', true);
+    expect(schedule[0].emi).toBeCloseTo(56821.57, 2);
+    // Later prepayments are unaffected by the option
+    const later = engine.calculatePrepayment(100000, 8.5, 24, [{ month: 12, amount: 20000 }], 'reduceEmi', true);
+    expect(later.newEmi).toBeCloseTo(2801.17, 2);
+  });
+
   it('handles reduce-EMI prepayments on an interest-free loan', () => {
     const r = engine.calculatePrepayment(120000, 0, 12, [{ month: 0, amount: 60000 }, { month: 6, amount: 30000 }], 'reduceEmi');
-    // ₹60k today leaves ₹60k over 12 months = ₹5,000 EMI; ₹30k after EMI 6 clears the rest
-    expect(r.newEmi).toBeCloseTo(5000, 6);
+    // ₹60k today: EMI 1 stays ₹10,000, then the ₹50k left is spread over 11 months; ₹30k after EMI 6 clears the rest
+    expect(r.newEmi).toBeCloseTo(50000 / 11, 6);
     expect(r.newTenure).toBe(6);
     expect(r.savings).toBe(0); // no interest to save on a 0% loan
     const schedule = engine.generateAmortizationSchedule(120000, 0, 12, new Date(), [{ month: 0, amount: 60000 }], 'reduceEmi');
-    expect(schedule[0].emi).toBeCloseTo(5000, 6);
+    expect(schedule[0].emi).toBeCloseTo(10000, 6);
+    expect(schedule[1].emi).toBeCloseTo(50000 / 11, 6);
     expect(schedule.every(row => Number.isFinite(row.emi))).toBe(true);
   });
 });
