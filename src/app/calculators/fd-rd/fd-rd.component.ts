@@ -9,20 +9,20 @@ import { InsightComponent } from '../../components/insight.component';
 import { CountUpComponent } from '../../components/count-up.component';
 import { ChartSeries } from '../../components/chart-wrapper.component';
 import { CalculatorEngineService } from '../../services/calculator-engine.service';
-import { SeoService } from '../../services/seo.service';
 import { formatIndian } from '../../shared/format';
 import { INVESTED_COLOR, RETURNS_COLOR, RETURNS_TEXT, GrowthPoint, growthChart } from '../../shared/growth';
 import { AdSlotComponent } from '../../components/ad-slot.component';
+import { FaqComponent } from '../../components/faq.component';
 
 @Component({
   selector: 'app-fd-rd',
   standalone: true,
-  imports: [AdSlotComponent, CommonModule, SliderInputComponent, ResultCardComponent, SegmentedControlComponent, SplitSummaryComponent, ChartCardComponent, InsightComponent, CountUpComponent],
+  imports: [AdSlotComponent, FaqComponent, CommonModule, SliderInputComponent, ResultCardComponent, SegmentedControlComponent, SplitSummaryComponent, ChartCardComponent, InsightComponent, CountUpComponent],
   template: `
     <div class="flex flex-col lg:flex-row gap-8">
       <!-- Input Section -->
       <div class="w-full lg:w-1/2 p-6 bg-white rounded-xl shadow-sm border border-slate-100">
-        <h2 class="text-2xl font-bold text-slate-800 mb-1">Bank Deposit Calculator</h2>
+        <h1 class="text-2xl font-bold text-slate-800 mb-1">FD &amp; RD Calculator</h1>
         <p class="text-sm text-slate-500 mb-6">Find the maturity amount of a fixed or recurring deposit.</p>
 
         <app-segmented-control
@@ -95,17 +95,8 @@ import { AdSlotComponent } from '../../components/ad-slot.component';
     <!-- In-content ad, after the results and before the FAQ -->
     <app-ad-slot placement="inContent" class="block mt-12" />
 
-    <!-- SEO FAQ Section -->
-    <div class="mt-12 p-8 bg-white rounded-xl shadow-sm border border-slate-100">
-      <h3 class="text-xl font-bold text-slate-800 mb-4">How is FD interest calculated?</h3>
-      <p class="text-slate-600 mb-4 text-sm leading-relaxed">
-        Most banks compound fixed deposit interest quarterly: <strong>Maturity = P × (1 + r/4)<sup>4t</sup></strong>, where P is the deposit, r the annual rate and t the tenure in years. Because interest is added four times a year, the effective yield is a little higher than the quoted rate.
-      </p>
-      <h3 class="text-xl font-bold text-slate-800 mb-4">How is RD interest calculated?</h3>
-      <p class="text-slate-600 text-sm leading-relaxed">
-        In a recurring deposit you pay a fixed amount every month. Each installment earns interest, compounded quarterly, from the month it is paid until maturity, so earlier installments earn more than later ones. The maturity value is the sum of all installments with their interest.
-      </p>
-    </div>
+    <!-- FAQs (text lives in shared/seo-content.ts) -->
+    <app-faq page="/fd-rd" />
   `
 })
 export class FdRdComponent implements OnInit {
@@ -124,12 +115,10 @@ export class FdRdComponent implements OnInit {
   chartSeries: ChartSeries[] = [];
 
   constructor(
-    private calculator: CalculatorEngineService,
-    private seo: SeoService
+    private calculator: CalculatorEngineService
   ) {}
 
   ngOnInit() {
-    this.updateSeo();
     this.calculate();
   }
 
@@ -142,16 +131,7 @@ export class FdRdComponent implements OnInit {
       this.amount = 5000;
       this.tenure = 60; // default 60 months
     }
-    this.updateSeo();
     this.calculate();
-  }
-
-  updateSeo() {
-    if (this.mode === 'FD') {
-      this.seo.updateSeoTags('FD Calculator', 'Calculate Fixed Deposit maturity amount.', 'FD calculator');
-    } else {
-      this.seo.updateSeoTags('RD Calculator', 'Calculate Recurring Deposit maturity amount.', 'RD calculator');
-    }
   }
 
   // Deposit value at the end of a period (years for FD, months for RD)

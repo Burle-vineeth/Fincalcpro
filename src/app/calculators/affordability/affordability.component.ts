@@ -8,21 +8,21 @@ import { InsightComponent } from '../../components/insight.component';
 import { CountUpComponent } from '../../components/count-up.component';
 import { ChartSeries } from '../../components/chart-wrapper.component';
 import { CalculatorEngineService } from '../../services/calculator-engine.service';
-import { SeoService } from '../../services/seo.service';
 import { formatIndian } from '../../shared/format';
 import { AdSlotComponent } from '../../components/ad-slot.component';
+import { FaqComponent } from '../../components/faq.component';
 
 const TENURE_OPTIONS = [5, 10, 15, 20, 25, 30];
 
 @Component({
   selector: 'app-affordability',
   standalone: true,
-  imports: [AdSlotComponent, CommonModule, SliderInputComponent, ResultCardComponent, SplitSummaryComponent, ChartCardComponent, InsightComponent, CountUpComponent],
+  imports: [AdSlotComponent, FaqComponent, CommonModule, SliderInputComponent, ResultCardComponent, SplitSummaryComponent, ChartCardComponent, InsightComponent, CountUpComponent],
   template: `
     <div class="flex flex-col lg:flex-row gap-8">
       <!-- Input Section -->
       <div class="w-full lg:w-1/2 p-6 bg-white rounded-xl shadow-sm border border-slate-100">
-        <h2 class="text-2xl font-bold text-slate-800 mb-1">Loan Affordability Calculator</h2>
+        <h1 class="text-2xl font-bold text-slate-800 mb-1">Loan Affordability Calculator</h1>
         <p class="text-sm text-slate-500 mb-6">Find how much you can borrow if all your EMIs stay within {{ emiShare }}% of your in-hand income.</p>
 
         <app-slider-input
@@ -102,13 +102,8 @@ const TENURE_OPTIONS = [5, 10, 15, 20, 25, 30];
     <!-- In-content ad, after the results and before the FAQ -->
     <app-ad-slot placement="inContent" class="block mt-12" />
 
-    <!-- SEO FAQ Section -->
-    <div class="mt-12 p-8 bg-white rounded-xl shadow-sm border border-slate-100">
-      <h3 class="text-xl font-bold text-slate-800 mb-4">How much home loan can I afford?</h3>
-      <p class="text-slate-600 mb-4 text-sm leading-relaxed">
-        Banks usually allow a maximum of 50-60% of your net monthly income to go towards paying EMIs. Borrowing within this limit ensures you have enough buffer for regular living expenses and contingencies.
-      </p>
-    </div>
+    <!-- FAQs (text lives in shared/seo-content.ts) -->
+    <app-faq page="/affordability" />
   `
 })
 export class AffordabilityComponent implements OnInit {
@@ -129,16 +124,10 @@ export class AffordabilityComponent implements OnInit {
   chartSeries: ChartSeries[] = [];
 
   constructor(
-    private calculator: CalculatorEngineService,
-    private seo: SeoService
+    private calculator: CalculatorEngineService
   ) {}
 
   ngOnInit() {
-    this.seo.updateSeoTags(
-      'Home Loan Affordability Calculator',
-      'Calculate exactly how much home loan or personal loan you can afford based on your net monthly salary.',
-      'Loan affordability calculator, max loan eligibility, how much loan can i get'
-    );
     this.calculate();
   }
 

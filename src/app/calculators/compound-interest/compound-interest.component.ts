@@ -9,10 +9,10 @@ import { InsightComponent } from '../../components/insight.component';
 import { CountUpComponent } from '../../components/count-up.component';
 import { ChartSeries } from '../../components/chart-wrapper.component';
 import { CalculatorEngineService } from '../../services/calculator-engine.service';
-import { SeoService } from '../../services/seo.service';
 import { formatIndian } from '../../shared/format';
 import { INVESTED_COLOR, RETURNS_COLOR, RETURNS_TEXT, growthChart } from '../../shared/growth';
 import { AdSlotComponent } from '../../components/ad-slot.component';
+import { FaqComponent } from '../../components/faq.component';
 
 const FREQUENCIES = [
   { value: 1, label: 'Annually', adverb: 'yearly' },
@@ -25,12 +25,12 @@ const FREQUENCIES = [
 @Component({
   selector: 'app-compound-interest',
   standalone: true,
-  imports: [AdSlotComponent, CommonModule, FormsModule, SliderInputComponent, ResultCardComponent, SplitSummaryComponent, ChartCardComponent, InsightComponent, CountUpComponent],
+  imports: [AdSlotComponent, FaqComponent, CommonModule, FormsModule, SliderInputComponent, ResultCardComponent, SplitSummaryComponent, ChartCardComponent, InsightComponent, CountUpComponent],
   template: `
     <div class="flex flex-col lg:flex-row gap-8">
       <!-- Input Section -->
       <div class="w-full lg:w-1/2 p-6 bg-white rounded-xl shadow-sm border border-slate-100">
-        <h2 class="text-2xl font-bold text-slate-800 mb-1">Compound Interest Calculator</h2>
+        <h1 class="text-2xl font-bold text-slate-800 mb-1">Compound Interest Calculator</h1>
         <p class="text-sm text-slate-500 mb-6">See how interest on interest grows your savings.</p>
 
         <app-slider-input
@@ -104,13 +104,8 @@ const FREQUENCIES = [
     <!-- In-content ad, after the results and before the FAQ -->
     <app-ad-slot placement="inContent" class="block mt-12" />
 
-    <!-- SEO FAQ Section -->
-    <div class="mt-12 p-8 bg-white rounded-xl shadow-sm border border-slate-100">
-      <h3 class="text-xl font-bold text-slate-800 mb-4">What is Compound Interest?</h3>
-      <p class="text-slate-600 mb-4 text-sm leading-relaxed">
-        Compound Interest is the interest on savings calculated on both the initial principal and the accumulated interest from previous periods. It essentially makes your money grow faster over time because you earn "interest on interest".
-      </p>
-    </div>
+    <!-- FAQs (text lives in shared/seo-content.ts) -->
+    <app-faq page="/compound-interest" />
   `
 })
 export class CompoundInterestComponent implements OnInit {
@@ -129,8 +124,7 @@ export class CompoundInterestComponent implements OnInit {
   chartSeries: ChartSeries[] = [];
 
   constructor(
-    private calculator: CalculatorEngineService,
-    private seo: SeoService
+    private calculator: CalculatorEngineService
   ) {}
 
   get frequencyAdverb(): string {
@@ -138,11 +132,6 @@ export class CompoundInterestComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.seo.updateSeoTags(
-      'Compound Interest Calculator',
-      'Calculate the future value of your savings with compound interest. See the magic of compounding over time.',
-      'Compound interest calculator, CI calculator, interest on interest'
-    );
     this.calculate();
   }
 

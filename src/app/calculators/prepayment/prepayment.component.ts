@@ -5,21 +5,21 @@ import { ResultCardComponent } from '../../components/result-card.component';
 import { ChartWrapperComponent } from '../../components/chart-wrapper.component';
 import { AmortizationTableComponent } from '../../components/amortization-table.component';
 import { CalculatorEngineService, PrepaymentPlan } from '../../services/calculator-engine.service';
-import { SeoService } from '../../services/seo.service';
 import { CountUpComponent } from '../../components/count-up.component';
 import { SegmentedControlComponent } from '../../components/segmented-control.component';
 import { InWordsPipe } from '../../shared/format';
 import { AdSlotComponent } from '../../components/ad-slot.component';
+import { FaqComponent } from '../../components/faq.component';
 
 @Component({
   selector: 'app-prepayment',
   standalone: true,
-  imports: [AdSlotComponent, CommonModule, SliderInputComponent, ResultCardComponent, ChartWrapperComponent, AmortizationTableComponent, SegmentedControlComponent, DecimalPipe, InWordsPipe, CountUpComponent],
+  imports: [AdSlotComponent, FaqComponent, CommonModule, SliderInputComponent, ResultCardComponent, ChartWrapperComponent, AmortizationTableComponent, SegmentedControlComponent, DecimalPipe, InWordsPipe, CountUpComponent],
   template: `
     <div class="flex flex-col lg:flex-row gap-8">
       <!-- Input Section -->
       <div class="w-full lg:w-1/2 p-6 bg-white rounded-xl shadow-sm border border-slate-100">
-        <h2 class="text-2xl font-bold text-slate-800 mb-6">Loan Prepayment Calculator</h2>
+        <h1 class="text-2xl font-bold text-slate-800 mb-6">Loan Prepayment Calculator</h1>
         
         <app-slider-input 
           label="Outstanding Principal" 
@@ -244,13 +244,8 @@ import { AdSlotComponent } from '../../components/ad-slot.component';
     <!-- In-content ad, after the results and before the FAQ -->
     <app-ad-slot placement="inContent" class="block mt-12" />
 
-    <!-- SEO FAQ Section -->
-    <div class="mt-12 p-8 bg-white rounded-xl shadow-sm border border-slate-100">
-      <h3 class="text-xl font-bold text-slate-800 mb-4">What is Loan Prepayment?</h3>
-      <p class="text-slate-600 mb-4 text-sm leading-relaxed">
-        Loan prepayment allows a borrower to pay off a significant portion of their outstanding principal ahead of schedule. Doing this reduces the outstanding principal amount, which exponentially reduces the total interest paid over the life of the loan.
-      </p>
-    </div>
+    <!-- FAQs (text lives in shared/seo-content.ts) -->
+    <app-faq page="/prepayment" />
   `
 })
 export class PrepaymentComponent implements OnInit {
@@ -287,16 +282,10 @@ export class PrepaymentComponent implements OnInit {
   emiChange: { emi: number, from: Date, until: Date, months: number, unchangedMonths: number, lowersAgain: boolean } | null = null;
 
   constructor(
-    private calculator: CalculatorEngineService,
-    private seo: SeoService
+    private calculator: CalculatorEngineService
   ) {}
 
   ngOnInit() {
-    this.seo.updateSeoTags(
-      'Loan Prepayment Calculator',
-      'Calculate interest savings by making a part-prepayment on your home or personal loan. See how much time and money you save.',
-      'Loan prepayment calculator, interest saved calculator, part payment calculator'
-    );
     this.calculate();
   }
 

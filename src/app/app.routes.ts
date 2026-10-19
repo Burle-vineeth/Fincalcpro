@@ -1,7 +1,11 @@
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'emi', pathMatch: 'full' },
+  {
+    path: '',
+    pathMatch: 'full',
+    loadComponent: () => import('./home/home.component').then(m => m.HomeComponent)
+  },
   { 
     path: 'emi', 
     loadComponent: () => import('./calculators/emi/emi.component').then(m => m.EmiComponent)

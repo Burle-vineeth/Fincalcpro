@@ -8,9 +8,9 @@ import { InsightComponent } from '../../components/insight.component';
 import { CountUpComponent } from '../../components/count-up.component';
 import { ChartSeries } from '../../components/chart-wrapper.component';
 import { CalculatorEngineService } from '../../services/calculator-engine.service';
-import { SeoService } from '../../services/seo.service';
 import { formatIndian } from '../../shared/format';
 import { AdSlotComponent } from '../../components/ad-slot.component';
+import { FaqComponent } from '../../components/faq.component';
 
 const TODAY_COLOR = '#3b82f6';
 const RISE_COLOR = '#ef4444';
@@ -18,12 +18,12 @@ const RISE_COLOR = '#ef4444';
 @Component({
   selector: 'app-inflation',
   standalone: true,
-  imports: [AdSlotComponent, CommonModule, SliderInputComponent, ResultCardComponent, SplitSummaryComponent, ChartCardComponent, InsightComponent, CountUpComponent],
+  imports: [AdSlotComponent, FaqComponent, CommonModule, SliderInputComponent, ResultCardComponent, SplitSummaryComponent, ChartCardComponent, InsightComponent, CountUpComponent],
   template: `
     <div class="flex flex-col lg:flex-row gap-8">
       <!-- Input Section -->
       <div class="w-full lg:w-1/2 p-6 bg-white rounded-xl shadow-sm border border-slate-100">
-        <h2 class="text-2xl font-bold text-slate-800 mb-1">Inflation Calculator</h2>
+        <h1 class="text-2xl font-bold text-slate-800 mb-1">Inflation Calculator</h1>
         <p class="text-sm text-slate-500 mb-6">Find out how much the same lifestyle will cost you in the future.</p>
 
         <app-slider-input
@@ -81,13 +81,8 @@ const RISE_COLOR = '#ef4444';
     <!-- In-content ad, after the results and before the FAQ -->
     <app-ad-slot placement="inContent" class="block mt-12" />
 
-    <!-- SEO FAQ Section -->
-    <div class="mt-12 p-8 bg-white rounded-xl shadow-sm border border-slate-100">
-      <h3 class="text-xl font-bold text-slate-800 mb-4">How does inflation affect costs?</h3>
-      <p class="text-slate-600 text-sm leading-relaxed">
-        Inflation is the rate at which prices rise each year. Because it compounds, the future cost is <strong>Cost today × (1 + inflation rate)<sup>years</sup></strong>. At 6% inflation prices roughly double every 12 years, so money that is not invested loses purchasing power over time.
-      </p>
-    </div>
+    <!-- FAQs (text lives in shared/seo-content.ts) -->
+    <app-faq page="/inflation" />
   `
 })
 export class InflationComponent implements OnInit {
@@ -105,16 +100,10 @@ export class InflationComponent implements OnInit {
   readonly Math = Math;
 
   constructor(
-    private calculator: CalculatorEngineService,
-    private seo: SeoService
+    private calculator: CalculatorEngineService
   ) {}
 
   ngOnInit() {
-    this.seo.updateSeoTags(
-      'Inflation Calculator',
-      'Calculate the future cost of living based on expected inflation rates over time.',
-      'Inflation calculator, future value calculator, time value of money'
-    );
     this.calculate();
   }
 
