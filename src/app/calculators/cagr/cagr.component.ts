@@ -10,11 +10,12 @@ import { ChartSeries } from '../../components/chart-wrapper.component';
 import { CalculatorEngineService } from '../../services/calculator-engine.service';
 import { SeoService } from '../../services/seo.service';
 import { INVESTED_COLOR, RETURNS_COLOR, RETURNS_TEXT, doublingYears } from '../../shared/growth';
+import { AdSlotComponent } from '../../components/ad-slot.component';
 
 @Component({
   selector: 'app-cagr',
   standalone: true,
-  imports: [CommonModule, SliderInputComponent, ResultCardComponent, SplitSummaryComponent, ChartCardComponent, InsightComponent, CountUpComponent],
+  imports: [AdSlotComponent, CommonModule, SliderInputComponent, ResultCardComponent, SplitSummaryComponent, ChartCardComponent, InsightComponent, CountUpComponent],
   template: `
     <div class="flex flex-col lg:flex-row gap-8">
       <!-- Input Section -->
@@ -80,6 +81,9 @@ import { INVESTED_COLOR, RETURNS_COLOR, RETURNS_TEXT, doublingYears } from '../.
       [labels]="chartLabels"
       [series]="chartSeries"
     ></app-chart-card>
+
+    <!-- In-content ad, after the results and before the FAQ -->
+    <app-ad-slot placement="inContent" class="block mt-12" />
 
     <!-- SEO FAQ Section -->
     <div class="mt-12 p-8 bg-white rounded-xl shadow-sm border border-slate-100">

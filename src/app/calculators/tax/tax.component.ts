@@ -9,11 +9,12 @@ import { CountUpComponent } from '../../components/count-up.component';
 import { CalculatorEngineService, IncomeTaxBreakdown, TaxRegime } from '../../services/calculator-engine.service';
 import { SeoService } from '../../services/seo.service';
 import { formatIndian, formatCompact } from '../../shared/format';
+import { AdSlotComponent } from '../../components/ad-slot.component';
 
 @Component({
   selector: 'app-tax',
   standalone: true,
-  imports: [CommonModule, SliderInputComponent, ResultCardComponent, SegmentedControlComponent, SplitSummaryComponent, InsightComponent, CountUpComponent],
+  imports: [AdSlotComponent, CommonModule, SliderInputComponent, ResultCardComponent, SegmentedControlComponent, SplitSummaryComponent, InsightComponent, CountUpComponent],
   template: `
     <div class="flex flex-col lg:flex-row gap-8">
       <!-- Input Section -->
@@ -121,6 +122,9 @@ import { formatIndian, formatCompact } from '../../shared/format';
         </div>
       </div>
     </div>
+
+    <!-- In-content ad, after the results and before the FAQ -->
+    <app-ad-slot placement="inContent" class="block mt-12" />
 
     <!-- SEO FAQ Section -->
     <div class="mt-12 p-8 bg-white rounded-xl shadow-sm border border-slate-100">

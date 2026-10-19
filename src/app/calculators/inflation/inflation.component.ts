@@ -10,6 +10,7 @@ import { ChartSeries } from '../../components/chart-wrapper.component';
 import { CalculatorEngineService } from '../../services/calculator-engine.service';
 import { SeoService } from '../../services/seo.service';
 import { formatIndian } from '../../shared/format';
+import { AdSlotComponent } from '../../components/ad-slot.component';
 
 const TODAY_COLOR = '#3b82f6';
 const RISE_COLOR = '#ef4444';
@@ -17,7 +18,7 @@ const RISE_COLOR = '#ef4444';
 @Component({
   selector: 'app-inflation',
   standalone: true,
-  imports: [CommonModule, SliderInputComponent, ResultCardComponent, SplitSummaryComponent, ChartCardComponent, InsightComponent, CountUpComponent],
+  imports: [AdSlotComponent, CommonModule, SliderInputComponent, ResultCardComponent, SplitSummaryComponent, ChartCardComponent, InsightComponent, CountUpComponent],
   template: `
     <div class="flex flex-col lg:flex-row gap-8">
       <!-- Input Section -->
@@ -76,6 +77,9 @@ const RISE_COLOR = '#ef4444';
       [series]="chartSeries"
       [stacked]="true"
     ></app-chart-card>
+
+    <!-- In-content ad, after the results and before the FAQ -->
+    <app-ad-slot placement="inContent" class="block mt-12" />
 
     <!-- SEO FAQ Section -->
     <div class="mt-12 p-8 bg-white rounded-xl shadow-sm border border-slate-100">

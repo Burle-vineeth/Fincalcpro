@@ -102,7 +102,7 @@ export class CalculatorEngineService {
     };
   }
 
-  generateAmortizationSchedule(principal: number, annualRate: number, months: number, startDate: Date, prepayments: { month: number, amount: number }[] = [], strategy: 'reduceTenure' | 'reduceEmi' = 'reduceTenure'): any[] {
+  generateAmortizationSchedule(principal: number, annualRate: number, months: number, startDate: Date, prepayments: { month: number, amount: number }[] = [], strategy: 'reduceTenure' | 'reduceEmi' = 'reduceTenure', lowerNextEmi = false): any[] {
     const schedule = [];
     const monthlyRate = annualRate / 12 / 100;
     const orig = this.calculateEmi(principal, annualRate, months);
@@ -118,8 +118,10 @@ export class CalculatorEngineService {
     balance -= initialPrepayment;
     if (balance < 0) balance = 0;
     
+    // The next EMI is usually already scheduled, so by default a "today" (month 0)
+    // prepayment only lowers the EMI from EMI 2 onwards. lowerNextEmi lowers EMI 1 too.
     let currentEmi = orig.emi;
-    if (initialPrepayment > 0 && strategy === 'reduceEmi' && balance > 0) {
+    if (initialPrepayment > 0 && strategy === 'reduceEmi' && lowerNextEmi && balance > 0) {
         currentEmi = this.emiFor(balance, monthlyRate, months);
     }
     
@@ -157,7 +159,8 @@ export class CalculatorEngineService {
             prepayment: prepaidThisMonth
         });
         
-        if (prepaidThisMonth > 0 && strategy === 'reduceEmi' && balance > 0) {
+        const reamortize = prepaidThisMonth > 0 || (i === 1 && initialPrepayment > 0 && !lowerNextEmi);
+        if (reamortize && strategy === 'reduceEmi' && balance > 0) {
             const remainingMonths = months - i;
             if (remainingMonths > 0) {
                 currentEmi = this.emiFor(balance, monthlyRate, remainingMonths);
@@ -190,9 +193,9 @@ export class CalculatorEngineService {
     return payments;
   }
 
-  calculatePrepayment(principal: number, annualRate: number, months: number, prepayments: { month: number, amount: number }[], strategy: 'reduceTenure' | 'reduceEmi' = 'reduceTenure') {
+  calculatePrepayment(principal: number, annualRate: number, months: number, prepayments: { month: number, amount: number }[], strategy: 'reduceTenure' | 'reduceEmi' = 'reduceTenure', lowerNextEmi = false) {
     const orig = this.calculateEmi(principal, annualRate, months);
-    const schedule = this.generateAmortizationSchedule(principal, annualRate, months, new Date(), prepayments, strategy);
+    const schedule = this.generateAmortizationSchedule(principal, annualRate, months, new Date(), prepayments, strategy, lowerNextEmi);
     
     // An empty schedule means a "today" (month 0) prepayment cleared the whole loan.
     if (schedule.length === 0) return { originalEmi: orig.emi, originalTenure: months, newTenure: 0, savings: orig.totalInterest, newEmi: 0 };

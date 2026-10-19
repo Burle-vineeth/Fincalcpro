@@ -10,21 +10,20 @@ import { ChartSeries } from '../../components/chart-wrapper.component';
 import { CalculatorEngineService } from '../../services/calculator-engine.service';
 import { SeoService } from '../../services/seo.service';
 import { formatIndian } from '../../shared/format';
+import { AdSlotComponent } from '../../components/ad-slot.component';
 
-// Banks typically cap all EMIs at about half of net monthly income (FOIR)
-const MAX_EMI_SHARE = 50;
 const TENURE_OPTIONS = [5, 10, 15, 20, 25, 30];
 
 @Component({
   selector: 'app-affordability',
   standalone: true,
-  imports: [CommonModule, SliderInputComponent, ResultCardComponent, SplitSummaryComponent, ChartCardComponent, InsightComponent, CountUpComponent],
+  imports: [AdSlotComponent, CommonModule, SliderInputComponent, ResultCardComponent, SplitSummaryComponent, ChartCardComponent, InsightComponent, CountUpComponent],
   template: `
     <div class="flex flex-col lg:flex-row gap-8">
       <!-- Input Section -->
       <div class="w-full lg:w-1/2 p-6 bg-white rounded-xl shadow-sm border border-slate-100">
         <h2 class="text-2xl font-bold text-slate-800 mb-1">Loan Affordability Calculator</h2>
-        <p class="text-sm text-slate-500 mb-6">Find how much you can borrow if all your EMIs stay within 50% of your in-hand income, a common bank limit.</p>
+        <p class="text-sm text-slate-500 mb-6">Find how much you can borrow if all your EMIs stay within {{ emiShare }}% of your in-hand income.</p>
 
         <app-slider-input
           label="Net Monthly Income"
@@ -42,6 +41,15 @@ const TENURE_OPTIONS = [5, 10, 15, 20, 25, 30];
           [value]="existingEmis"
           (valueChange)="existingEmis = $event; calculate()"
           prefix="₹"
+        ></app-slider-input>
+
+        <app-slider-input
+          label="Max EMI Share of Income"
+          hint="Banks usually allow 40–60% (FOIR), higher for larger incomes"
+          [min]="10" [max]="80" [step]="1"
+          [value]="emiShare"
+          (valueChange)="emiShare = $event; calculate()"
+          suffix="%"
         ></app-slider-input>
 
         <app-slider-input
@@ -73,7 +81,7 @@ const TENURE_OPTIONS = [5, 10, 15, 20, 25, 30];
           <app-split-summary [parts]="parts" totalLabel="Monthly Income" centerLabel="Income"></app-split-summary>
 
           @if (results.maxEmi <= 0) {
-            <app-insight>Your existing EMIs already use {{ MAX_EMI_SHARE }}% or more of your income, so banks are unlikely to approve a new loan.</app-insight>
+            <app-insight>Your existing EMIs already use {{ emiShare }}% or more of your income, so banks are unlikely to approve a new loan.</app-insight>
           } @else {
             <app-insight>
               Over {{ tenure }} years you would pay <strong>₹{{ fmt(Math.round(totalInterest)) }}</strong> in interest on this loan,
@@ -91,6 +99,9 @@ const TENURE_OPTIONS = [5, 10, 15, 20, 25, 30];
       [series]="chartSeries"
     ></app-chart-card>
 
+    <!-- In-content ad, after the results and before the FAQ -->
+    <app-ad-slot placement="inContent" class="block mt-12" />
+
     <!-- SEO FAQ Section -->
     <div class="mt-12 p-8 bg-white rounded-xl shadow-sm border border-slate-100">
       <h3 class="text-xl font-bold text-slate-800 mb-4">How much home loan can I afford?</h3>
@@ -105,8 +116,9 @@ export class AffordabilityComponent implements OnInit {
   existingEmis = 0;
   rate = 8.5;
   tenure = 20;
+  // Share of net income all EMIs may take (FOIR); banks typically allow about half
+  emiShare = 50;
 
-  readonly MAX_EMI_SHARE = MAX_EMI_SHARE;
   readonly fmt = formatIndian;
   readonly Math = Math;
 
@@ -131,7 +143,7 @@ export class AffordabilityComponent implements OnInit {
   }
 
   calculate() {
-    this.results = this.calculator.calculateAffordability(this.income, MAX_EMI_SHARE, this.rate, this.tenure * 12, this.existingEmis);
+    this.results = this.calculator.calculateAffordability(this.income, this.emiShare, this.rate, this.tenure * 12, this.existingEmis);
     this.totalInterest = this.results.maxEmi * this.tenure * 12 - this.results.maxLoanAmount;
 
     const existing = Math.min(this.existingEmis, this.income);
@@ -144,7 +156,7 @@ export class AffordabilityComponent implements OnInit {
     this.chartLabels = TENURE_OPTIONS.map(y => `${y} yrs`);
     this.chartSeries = [{
       label: 'Maximum loan',
-      data: TENURE_OPTIONS.map(y => this.calculator.calculateAffordability(this.income, MAX_EMI_SHARE, this.rate, y * 12, this.existingEmis).maxLoanAmount),
+      data: TENURE_OPTIONS.map(y => this.calculator.calculateAffordability(this.income, this.emiShare, this.rate, y * 12, this.existingEmis).maxLoanAmount),
       color: '#3b82f6'
     }];
   }

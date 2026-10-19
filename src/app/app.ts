@@ -1,11 +1,14 @@
-import { Component, signal } from '@angular/core';
+import { Component, isDevMode, signal } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { CALCULATORS } from './shared/calculators';
+import { AdSlotComponent } from './components/ad-slot.component';
+import { AdsService } from './services/ads.service';
+import { ADS_ENABLED } from './shared/ads.config';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, AdSlotComponent],
   templateUrl: './app.html',
 })
 export class App {
@@ -15,13 +18,23 @@ export class App {
 
   isMenuOpen = signal<boolean>(false);
   activeCalcName = signal<string>(this.getInitialCalcName());
+
+  // Ad areas are shown once AdSense is configured (or as placeholders in development)
+  readonly showAds = ADS_ENABLED || isDevMode();
+  // Bumped on every page change to refresh the header and sidebar ads
+  navCount = signal(0);
+  private firstNavDone = false;
   
-  constructor(private router: Router) {
+  constructor(private router: Router, ads: AdsService) {
+    ads.addVerificationTag();
     this.router.events.subscribe(event => {
       // @ts-ignore
       if (event instanceof NavigationEnd || event?.type === 1 || event?.constructor?.name === 'NavigationEnd') {
         const url = (event as any).urlAfterRedirects;
         this.autoDetectRoute(url);
+        // The first navigation is the initial page load, whose ads are already in place
+        if (this.firstNavDone) this.navCount.update(n => n + 1);
+        this.firstNavDone = true;
       }
     });
   }

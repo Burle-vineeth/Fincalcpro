@@ -66,12 +66,12 @@
     </div>
   </header>
 
-  <!-- Top Ad Slot -->
-  <div class="w-full bg-slate-100 py-4 flex justify-center border-b border-slate-200">
-    <div class="w-[320px] h-[50px] md:w-[728px] md:h-[90px] bg-slate-200 border border-dashed border-slate-300 flex items-center justify-center text-slate-400 text-sm">
-      Ad Slot: Top Banner
+  <!-- Top Ad Slot (refreshed on every page change so each page view gets a fresh ad) -->
+  @if (showAds) {
+    <div class="w-full bg-slate-100 py-3 flex justify-center border-b border-slate-200">
+      <app-ad-slot placement="top" [refreshKey]="navCount()" />
     </div>
-  </div>
+  }
 
   <!-- Main Content -->
   <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex flex-col xl:flex-row gap-8">
@@ -82,24 +82,18 @@
     </div>
 
     <!-- Right Sidebar Ad Slot -->
-    <div class="hidden xl:block w-[300px] shrink-0">
-      <div class="sticky top-24">
-        <div class="w-[300px] h-[600px] bg-slate-200 border border-dashed border-slate-300 flex items-center justify-center text-slate-400 text-sm">
-          Ad Slot: Sidebar (300x600)
+    @if (showAds) {
+      <div class="hidden xl:block w-[300px] shrink-0">
+        <div class="sticky top-24">
+          <app-ad-slot placement="sidebar" [refreshKey]="navCount()" />
         </div>
       </div>
-    </div>
+    }
   </main>
-
-  <!-- Bottom / Mobile Anchor Ad -->
-  <div class="w-full bg-slate-100 py-3 flex justify-center border-t border-slate-200 text-xs text-slate-500">
-    <div class="w-[320px] h-[50px] bg-slate-200 border border-dashed border-slate-300 flex items-center justify-center text-slate-400">
-      Ad Slot: Sticky Bottom
-    </div>
-  </div>
 
   <!-- Footer -->
   <footer class="bg-white py-6 border-t border-slate-200 text-center">
     <p class="text-sm text-slate-500">© 2026 FinCalc Pro. Information provided for educational purposes only.</p>
+    <p class="text-sm mt-2"><a routerLink="/privacy" class="text-slate-500 hover:text-blue-700 underline">Privacy Policy</a></p>
   </footer>
 </div>

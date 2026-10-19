@@ -9,11 +9,12 @@ import { SeoService } from '../../services/seo.service';
 import { CountUpComponent } from '../../components/count-up.component';
 import { SegmentedControlComponent } from '../../components/segmented-control.component';
 import { InWordsPipe } from '../../shared/format';
+import { AdSlotComponent } from '../../components/ad-slot.component';
 
 @Component({
   selector: 'app-prepayment',
   standalone: true,
-  imports: [CommonModule, SliderInputComponent, ResultCardComponent, ChartWrapperComponent, AmortizationTableComponent, SegmentedControlComponent, DecimalPipe, InWordsPipe, CountUpComponent],
+  imports: [AdSlotComponent, CommonModule, SliderInputComponent, ResultCardComponent, ChartWrapperComponent, AmortizationTableComponent, SegmentedControlComponent, DecimalPipe, InWordsPipe, CountUpComponent],
   template: `
     <div class="flex flex-col lg:flex-row gap-8">
       <!-- Input Section -->
@@ -53,8 +54,17 @@ import { InWordsPipe } from '../../shared/format';
         <p class="text-xs text-slate-500 -mt-4 mb-6">
           {{ strategy === 'reduceTenure'
             ? 'Keep paying the same EMI and close the loan sooner. This saves the most interest.'
-            : 'Keep the same end date and pay a smaller EMI from the next month.' }}
+            : 'Keep the same end date and pay a smaller EMI after each prepayment.' }}
         </p>
+
+        @if (strategy === 'reduceEmi' && hasTodayPrepayment) {
+          <app-segmented-control
+            label="New EMI starts from"
+            [options]="emiStartOptions"
+            [value]="lowerNextEmi"
+            (valueChange)="lowerNextEmi = $event; calculate()"
+          ></app-segmented-control>
+        }
 
         <div class="mt-8 mb-4 flex justify-between items-center border-b border-slate-100 pb-2">
           <h3 class="text-sm font-bold text-slate-700">Prepayments</h3>
@@ -141,7 +151,7 @@ import { InWordsPipe } from '../../shared/format';
               <p class="text-xs text-slate-500 font-medium mb-1">EMI</p>
               <p class="text-sm font-bold text-slate-800"><app-count-up [value]="results.newEmi" prefix="₹" /></p>
               @if (results.newEmi < results.originalEmi - 0.5 && results.newEmi > 0) {
-                <p class="text-xs text-slate-400 line-through"><app-count-up [value]="results.originalEmi" prefix="₹" /></p>
+                <p class="text-xs font-semibold text-green-600">↓ ₹{{ results.originalEmi - results.newEmi | number:'1.0-0' }}</p>
               }
             </div>
             <div class="bg-slate-50 py-3 px-1 rounded-xl border border-slate-100">
@@ -153,6 +163,63 @@ import { InWordsPipe } from '../../shared/format';
               <p class="text-sm font-bold text-green-600">{{ results.originalTenure - results.newTenure }} months</p>
             </div>
           </div>
+
+          @if (emiChange; as change) {
+            <div class="rounded-xl border border-amber-200 bg-gradient-to-br from-amber-50 to-white overflow-hidden">
+              <div class="flex items-center justify-between gap-2 px-4 py-2.5 border-b border-amber-100">
+                <p class="text-xs font-bold text-amber-800 uppercase tracking-wider">Your EMI change</p>
+                <span class="text-xs font-bold text-green-700 bg-green-100 px-2.5 py-1 rounded-full whitespace-nowrap">
+                  ↓ ₹{{ results.originalEmi - change.emi | number:'1.0-0' }} / month
+                </span>
+              </div>
+
+              <div class="px-4 py-4 flex items-center justify-center gap-3 sm:gap-6">
+                <div class="text-center">
+                  <p class="text-xs text-slate-500 mb-0.5">Current EMI</p>
+                  <p class="text-lg sm:text-xl font-semibold text-slate-400 line-through decoration-slate-300">₹{{ results.originalEmi | number:'1.0-0' }}</p>
+                </div>
+                <svg class="w-6 h-6 text-amber-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-5-5 5 5-5 5" />
+                </svg>
+                <div class="text-center">
+                  <p class="text-xs text-slate-500 mb-0.5">New EMI</p>
+                  <p class="text-2xl sm:text-3xl font-bold text-green-600">₹{{ change.emi | number:'1.0-0' }}</p>
+                </div>
+              </div>
+
+              <ol class="mx-4 mb-4 rounded-lg bg-white border border-slate-100 divide-y divide-slate-100 text-sm">
+                @if (change.unchangedMonths > 0) {
+                  <li class="flex items-center gap-3 px-3 py-2.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-slate-300 shrink-0" aria-hidden="true"></span>
+                    <div class="flex-1 min-w-0">
+                      <p class="font-medium text-slate-700">{{ emiDate(1) | date:'MMM yyyy' }}</p>
+                      <p class="text-xs text-slate-500">Already scheduled, so it stays the same</p>
+                    </div>
+                    <p class="font-semibold text-slate-700 whitespace-nowrap">₹{{ results.originalEmi | number:'1.0-0' }}</p>
+                  </li>
+                }
+                <li class="flex items-center gap-3 px-3 py-2.5">
+                  <span class="w-2.5 h-2.5 rounded-full bg-green-500 shrink-0" aria-hidden="true"></span>
+                  <div class="flex-1 min-w-0">
+                    <p class="font-medium text-slate-700">
+                      {{ change.from | date:'MMM yyyy' }}@if (change.months > 1) { – {{ change.until | date:'MMM yyyy' }}}
+                    </p>
+                    <p class="text-xs text-slate-500">
+                      {{ change.months }} EMI{{ change.months > 1 ? 's' : '' }} at the new amount
+                      @if (change.lowersAgain) { · lowers again after later prepayments }
+                    </p>
+                  </div>
+                  <p class="font-semibold text-green-700 whitespace-nowrap">₹{{ change.emi | number:'1.0-0' }}</p>
+                </li>
+              </ol>
+
+              @if (hasTodayPrepayment && lowerNextEmi) {
+                <p class="mx-4 mb-4 -mt-1 text-xs text-amber-800">
+                  This assumes your bank revises the EMI before it collects your next one.
+                </p>
+              }
+            </div>
+          }
 
           <div class="mt-2 border-t border-slate-100 pt-6">
             <p class="text-sm font-semibold text-slate-700 mb-2">Total interest payable</p>
@@ -174,6 +241,9 @@ import { InWordsPipe } from '../../shared/format';
       <app-amortization-table [schedule]="schedule"></app-amortization-table>
     </div>
 
+    <!-- In-content ad, after the results and before the FAQ -->
+    <app-ad-slot placement="inContent" class="block mt-12" />
+
     <!-- SEO FAQ Section -->
     <div class="mt-12 p-8 bg-white rounded-xl shadow-sm border border-slate-100">
       <h3 class="text-xl font-bold text-slate-800 mb-4">What is Loan Prepayment?</h3>
@@ -188,7 +258,7 @@ export class PrepaymentComponent implements OnInit {
   rate = 8.5;
   tenureMonths = 180;
   prepaymentsList: PrepaymentPlan[] = [
-    { month: 12, amount: 200000, frequency: 'once' }
+    { month: 0, amount: 200000, frequency: 'once' }
   ];
   strategy: 'reduceTenure' | 'reduceEmi' = 'reduceTenure';
 
@@ -198,6 +268,13 @@ export class PrepaymentComponent implements OnInit {
     { value: 'yearly', label: 'Yearly' }
   ];
   readonly startDate = new Date();
+  // Reduce EMI with a "today" prepayment: lower the very next EMI, or keep it (already scheduled)
+  lowerNextEmi = false;
+  readonly emiStartOptions = [
+    { value: true, label: `${this.monthLabel(1)} (next EMI)` },
+    { value: false, label: this.monthLabel(2) }
+  ];
+  hasTodayPrepayment = false;
 
   results = { originalEmi: 0, originalTenure: 180, newTenure: 180, newEmi: 0, savings: 0 };
   chartData: number[] = [];
@@ -205,6 +282,9 @@ export class PrepaymentComponent implements OnInit {
   // Per plan: how many of its payments fall before the loan closes
   planStatus: { planned: number, applied: number, lastMonth: number, total: number, closesLoan: boolean }[] = [];
   totalPrepaid = 0;
+  // Reduce EMI: when the first lower EMI is paid, and how many EMIs before it are unchanged
+  // and how long the new EMI runs before a later prepayment lowers it again
+  emiChange: { emi: number, from: Date, until: Date, months: number, unchangedMonths: number, lowersAgain: boolean } | null = null;
 
   constructor(
     private calculator: CalculatorEngineService,
@@ -223,7 +303,7 @@ export class PrepaymentComponent implements OnInit {
   addPrepayment() {
     const nextMonth = this.prepaymentsList.length > 0 
       ? Math.min(this.prepaymentsList[this.prepaymentsList.length - 1].month + 12, this.tenureMonths) 
-      : 12;
+      : 0;
     this.prepaymentsList.push({ month: nextMonth, amount: 100000, frequency: 'once' });
     this.calculate();
   }
@@ -243,17 +323,39 @@ export class PrepaymentComponent implements OnInit {
     return new Date(this.startDate.getFullYear(), this.startDate.getMonth() + n, 1);
   }
 
+  private monthLabel(n: number): string {
+    return this.emiDate(n).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+  }
+
   calculate() {
     const payments = this.calculator.expandPrepayments(this.prepaymentsList, this.tenureMonths);
-    this.results = this.calculator.calculatePrepayment(this.principal, this.rate, this.tenureMonths, payments, this.strategy);
+    this.hasTodayPrepayment = payments.some(p => p.month <= 0);
+    this.results = this.calculator.calculatePrepayment(this.principal, this.rate, this.tenureMonths, payments, this.strategy, this.lowerNextEmi);
 
     const origInterest = this.calculator.calculateEmi(this.principal, this.rate, this.tenureMonths).totalInterest;
     this.chartData = [origInterest, origInterest - this.results.savings];
 
-    this.schedule = this.calculator.generateAmortizationSchedule(this.principal, this.rate, this.tenureMonths, this.startDate, payments, this.strategy);
+    this.schedule = this.calculator.generateAmortizationSchedule(this.principal, this.rate, this.tenureMonths, this.startDate, payments, this.strategy, this.lowerNextEmi);
     this.totalPrepaid = this.schedule.reduce((sum, row) => sum + row.prepayment, 0)
       + payments.filter(p => p.month <= 0).reduce((sum, p) => sum + p.amount, 0);
     if (this.schedule.length === 0) this.totalPrepaid = Math.min(this.totalPrepaid, this.principal);
+
+    const firstLower = this.schedule.findIndex(row => row.regularEmi < this.results.originalEmi - 0.5);
+    if (this.strategy === 'reduceEmi' && firstLower >= 0) {
+      const emi = this.schedule[firstLower].regularEmi;
+      let last = firstLower;
+      while (last + 1 < this.schedule.length && Math.abs(this.schedule[last + 1].regularEmi - emi) < 0.5) last++;
+      this.emiChange = {
+        emi,
+        from: this.schedule[firstLower].date,
+        until: this.schedule[last].date,
+        months: last - firstLower + 1,
+        unchangedMonths: this.hasTodayPrepayment ? firstLower : 0,
+        lowersAgain: last + 1 < this.schedule.length
+      };
+    } else {
+      this.emiChange = null;
+    }
 
     // A payment after EMI m is used if the loan still has a balance at that point
     const lastEmi = this.schedule.length;
