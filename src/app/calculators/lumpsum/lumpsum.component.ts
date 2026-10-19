@@ -8,20 +8,20 @@ import { InsightComponent } from '../../components/insight.component';
 import { CountUpComponent } from '../../components/count-up.component';
 import { ChartSeries } from '../../components/chart-wrapper.component';
 import { CalculatorEngineService } from '../../services/calculator-engine.service';
-import { SeoService } from '../../services/seo.service';
 import { formatIndian } from '../../shared/format';
 import { INVESTED_COLOR, RETURNS_COLOR, RETURNS_TEXT, doublingYears, growthChart } from '../../shared/growth';
 import { AdSlotComponent } from '../../components/ad-slot.component';
+import { FaqComponent } from '../../components/faq.component';
 
 @Component({
   selector: 'app-lumpsum',
   standalone: true,
-  imports: [AdSlotComponent, CommonModule, SliderInputComponent, ResultCardComponent, SplitSummaryComponent, ChartCardComponent, InsightComponent, CountUpComponent],
+  imports: [AdSlotComponent, FaqComponent, CommonModule, SliderInputComponent, ResultCardComponent, SplitSummaryComponent, ChartCardComponent, InsightComponent, CountUpComponent],
   template: `
     <div class="flex flex-col lg:flex-row gap-8">
       <!-- Input Section -->
       <div class="w-full lg:w-1/2 p-6 bg-white rounded-xl shadow-sm border border-slate-100">
-        <h2 class="text-2xl font-bold text-slate-800 mb-1">Lumpsum Calculator</h2>
+        <h1 class="text-2xl font-bold text-slate-800 mb-1">Lumpsum Calculator</h1>
         <p class="text-sm text-slate-500 mb-6">See what a one-time investment could grow to over time.</p>
 
         <app-slider-input
@@ -78,13 +78,8 @@ import { AdSlotComponent } from '../../components/ad-slot.component';
     <!-- In-content ad, after the results and before the FAQ -->
     <app-ad-slot placement="inContent" class="block mt-12" />
 
-    <!-- SEO FAQ Section -->
-    <div class="mt-12 p-8 bg-white rounded-xl shadow-sm border border-slate-100">
-      <h3 class="text-xl font-bold text-slate-800 mb-4">What is a Lumpsum Investment?</h3>
-      <p class="text-slate-600 mb-4 text-sm leading-relaxed">
-        A Lumpsum investment is a single bulk payment made into a financial asset (like equity, mutual funds, or bonds). It is preferred by investors who have significant cash on hand to generate long-term compounding growth.
-      </p>
-    </div>
+    <!-- FAQs (text lives in shared/seo-content.ts) -->
+    <app-faq page="/lumpsum" />
   `
 })
 export class LumpsumComponent implements OnInit {
@@ -102,16 +97,10 @@ export class LumpsumComponent implements OnInit {
   readonly fmt = formatIndian;
 
   constructor(
-    private calculator: CalculatorEngineService,
-    private seo: SeoService
+    private calculator: CalculatorEngineService
   ) {}
 
   ngOnInit() {
-    this.seo.updateSeoTags(
-      'Mutual Fund Lumpsum Calculator',
-      'Calculate the future value of your one-time lumpsum investments with compounding interest.',
-      'Lumpsum calculator, mutual fund lump sum return, compound interest investment'
-    );
     this.calculate();
   }
 

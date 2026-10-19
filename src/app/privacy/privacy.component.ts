@@ -1,5 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { SeoService } from '../services/seo.service';
+import { Component } from '@angular/core';
 import { CONTACT_EMAIL } from '../shared/ads.config';
 
 // Required by Google AdSense: sites showing ads must disclose cookie use by Google and its partners
@@ -44,17 +43,7 @@ import { CONTACT_EMAIL } from '../shared/ads.config';
     </article>
   `
 })
-export class PrivacyComponent implements OnInit {
+export class PrivacyComponent {
   readonly contactEmail = CONTACT_EMAIL;
   readonly lastUpdated = '19 October 2026';
-
-  constructor(private seo: SeoService) {}
-
-  ngOnInit() {
-    this.seo.updateSeoTags(
-      'Privacy Policy',
-      'How FinCalcPro handles your data, cookies and advertising.',
-      'privacy policy, cookies, advertising'
-    );
-  }
 }

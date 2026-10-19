@@ -8,20 +8,20 @@ import { InsightComponent } from '../../components/insight.component';
 import { CountUpComponent } from '../../components/count-up.component';
 import { ChartSeries } from '../../components/chart-wrapper.component';
 import { CalculatorEngineService } from '../../services/calculator-engine.service';
-import { SeoService } from '../../services/seo.service';
 import { formatIndian } from '../../shared/format';
 import { INVESTED_COLOR, RETURNS_COLOR, RETURNS_TEXT, growthChart } from '../../shared/growth';
 import { AdSlotComponent } from '../../components/ad-slot.component';
+import { FaqComponent } from '../../components/faq.component';
 
 @Component({
   selector: 'app-sip',
   standalone: true,
-  imports: [AdSlotComponent, CommonModule, SliderInputComponent, ResultCardComponent, SplitSummaryComponent, ChartCardComponent, InsightComponent, CountUpComponent],
+  imports: [AdSlotComponent, FaqComponent, CommonModule, SliderInputComponent, ResultCardComponent, SplitSummaryComponent, ChartCardComponent, InsightComponent, CountUpComponent],
   template: `
     <div class="flex flex-col lg:flex-row gap-8">
       <!-- Input Section -->
       <div class="w-full lg:w-1/2 p-6 bg-white rounded-xl shadow-sm border border-slate-100">
-        <h2 class="text-2xl font-bold text-slate-800 mb-1">SIP Calculator</h2>
+        <h1 class="text-2xl font-bold text-slate-800 mb-1">SIP Calculator</h1>
         <p class="text-sm text-slate-500 mb-6">See what a fixed monthly investment in mutual funds could grow to.</p>
 
         <app-slider-input
@@ -78,17 +78,8 @@ import { AdSlotComponent } from '../../components/ad-slot.component';
     <!-- In-content ad, after the results and before the FAQ -->
     <app-ad-slot placement="inContent" class="block mt-12" />
 
-    <!-- SEO FAQ Section -->
-    <div class="mt-12 p-8 bg-white rounded-xl shadow-sm border border-slate-100">
-      <h3 class="text-xl font-bold text-slate-800 mb-4">What is a SIP?</h3>
-      <p class="text-slate-600 mb-4 text-sm leading-relaxed">
-        Systematic Investment Plan (SIP) allows you to invest a small, fixed amount in mutual funds at regular intervals. This strategy enforces financial discipline and averages out the cost of investment over time, mitigating market volatility.
-      </p>
-      <h3 class="text-xl font-bold text-slate-800 mb-4">How are SIP returns calculated?</h3>
-      <p class="text-slate-600 text-sm leading-relaxed">
-        The expected return is treated as an annual growth rate, the way mutual fund returns (CAGR) are reported. It is converted to the equivalent monthly rate, <strong>(1 + annual rate)<sup>1/12</sup> − 1</strong>, and each monthly installment grows at that rate from the day it is invested. Some calculators simply divide the annual rate by 12, which compounds to a higher yearly return (12% becomes about 12.68%) and shows larger figures.
-      </p>
-    </div>
+    <!-- FAQs (text lives in shared/seo-content.ts) -->
+    <app-faq page="/sip" />
   `
 })
 export class SipComponent implements OnInit {
@@ -106,16 +97,10 @@ export class SipComponent implements OnInit {
   readonly fmt = formatIndian;
 
   constructor(
-    private calculator: CalculatorEngineService,
-    private seo: SeoService
+    private calculator: CalculatorEngineService
   ) {}
 
   ngOnInit() {
-    this.seo.updateSeoTags(
-      'Mutual Fund SIP Calculator',
-      'Calculate the future value of your monthly mutual fund investments (SIP) with compounding interest.',
-      'SIP calculator, mutual fund calculator, compound interest SIP'
-    );
     this.calculate();
   }
 

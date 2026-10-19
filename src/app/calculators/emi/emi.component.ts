@@ -6,12 +6,12 @@ import { ChartSeries } from '../../components/chart-wrapper.component';
 import { AmortizationTableComponent } from '../../components/amortization-table.component';
 import { SegmentedControlComponent } from '../../components/segmented-control.component';
 import { CalculatorEngineService } from '../../services/calculator-engine.service';
-import { SeoService } from '../../services/seo.service';
 import { CountUpComponent } from '../../components/count-up.component';
 import { SplitSummaryComponent, SplitPart } from '../../components/split-summary.component';
 import { ChartCardComponent } from '../../components/chart-card.component';
 import { InsightComponent } from '../../components/insight.component';
 import { AdSlotComponent } from '../../components/ad-slot.component';
+import { FaqComponent } from '../../components/faq.component';
 
 type LoanType = 'home' | 'car' | 'personal';
 
@@ -25,12 +25,12 @@ const LOAN_PRESETS: Record<LoanType, { principal: number, rate: number, tenure: 
 @Component({
   selector: 'app-emi',
   standalone: true,
-  imports: [AdSlotComponent, CommonModule, SliderInputComponent, ResultCardComponent, AmortizationTableComponent, SegmentedControlComponent, SplitSummaryComponent, ChartCardComponent, InsightComponent, CountUpComponent],
+  imports: [AdSlotComponent, FaqComponent, CommonModule, SliderInputComponent, ResultCardComponent, AmortizationTableComponent, SegmentedControlComponent, SplitSummaryComponent, ChartCardComponent, InsightComponent, CountUpComponent],
   template: `
     <div class="flex flex-col lg:flex-row gap-8">
       <!-- Input Section -->
       <div class="w-full lg:w-1/2 p-6 bg-white rounded-xl shadow-sm border border-slate-100">
-        <h2 class="text-2xl font-bold text-slate-800 mb-1">EMI Calculator</h2>
+        <h1 class="text-2xl font-bold text-slate-800 mb-1">EMI Calculator</h1>
         <p class="text-sm text-slate-500 mb-6">Find your monthly installment and the total interest on a loan.</p>
 
         <app-segmented-control
@@ -126,21 +126,8 @@ const LOAN_PRESETS: Record<LoanType, { principal: number, rate: number, tenure: 
     <!-- In-content ad, after the results and before the FAQ -->
     <app-ad-slot placement="inContent" class="block mt-12" />
 
-    <!-- SEO FAQ Section -->
-    <div class="mt-12 p-8 bg-white rounded-xl shadow-sm border border-slate-100">
-      <h3 class="text-xl font-bold text-slate-800 mb-4">What is an EMI?</h3>
-      <p class="text-slate-600 mb-4 text-sm leading-relaxed">
-        EMI stands for Equated Monthly Installment. It is a fixed payment amount made by a borrower to a lender at a specified date each calendar month. EMIs are used to pay off both interest and principal each month so that over a specified number of years, the loan is paid off in full.
-      </p>
-      <h3 class="text-xl font-bold text-slate-800 mb-4">How is EMI calculated?</h3>
-      <p class="text-slate-600 text-sm leading-relaxed">
-        The formula used for calculating EMI is: <strong>E = P x R x (1+R)^N / [(1+R)^N-1]</strong><br><br>
-        <strong>E</strong> is the EMI.<br>
-        <strong>P</strong> is the Principal Loan Amount.<br>
-        <strong>R</strong> is the rate of interest calculated on a monthly basis.<br>
-        <strong>N</strong> is the loan tenure in months.
-      </p>
-    </div>
+    <!-- FAQs (text lives in shared/seo-content.ts) -->
+    <app-faq page="/emi" />
   `
 })
 export class EmiComponent implements OnInit {
@@ -163,16 +150,10 @@ export class EmiComponent implements OnInit {
   yearSeries: ChartSeries[] = [];
 
   constructor(
-    private calculator: CalculatorEngineService,
-    private seo: SeoService
+    private calculator: CalculatorEngineService
   ) {}
 
   ngOnInit() {
-    this.seo.updateSeoTags(
-      'EMI Calculator',
-      'Calculate your Equated Monthly Installment (EMI) for home loans, car loans, and personal loans. Find out your total interest outgo.',
-      'EMI calculator, home loan emi, car loan emi, personal loan emi'
-    );
     this.calculate();
   }
 

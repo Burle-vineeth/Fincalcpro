@@ -92,8 +92,26 @@
   </main>
 
   <!-- Footer -->
-  <footer class="bg-white py-6 border-t border-slate-200 text-center">
-    <p class="text-sm text-slate-500">© 2026 FinCalc Pro. Information provided for educational purposes only.</p>
-    <p class="text-sm mt-2"><a routerLink="/privacy" class="text-slate-500 hover:text-blue-700 underline">Privacy Policy</a></p>
+  <footer class="bg-white border-t border-slate-200">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-2 sm:grid-cols-4 gap-6 text-sm" aria-label="All calculators">
+      @for (group of footerGroups; track group.label) {
+        <div>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">{{ group.label }}</p>
+          <ul class="space-y-1.5">
+            @for (calc of group.items; track calc.route) {
+              <li><a [routerLink]="calc.route" (click)="scrollToTop()" class="text-slate-600 hover:text-blue-700">{{ calc.name }}</a></li>
+            }
+          </ul>
+        </div>
+      }
+      <div>
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">FinCalcPro</p>
+        <ul class="space-y-1.5">
+          <li><a routerLink="/" (click)="scrollToTop()" class="text-slate-600 hover:text-blue-700">All Calculators</a></li>
+          <li><a routerLink="/privacy" (click)="scrollToTop()" class="text-slate-600 hover:text-blue-700">Privacy Policy</a></li>
+        </ul>
+      </div>
+    </nav>
+    <p class="text-center text-sm text-slate-500 py-4 border-t border-slate-100">© 2026 FinCalc Pro. Information provided for educational purposes only.</p>
   </footer>
 </div>

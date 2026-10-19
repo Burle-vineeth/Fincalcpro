@@ -8,19 +8,19 @@ import { InsightComponent } from '../../components/insight.component';
 import { CountUpComponent } from '../../components/count-up.component';
 import { ChartSeries } from '../../components/chart-wrapper.component';
 import { CalculatorEngineService } from '../../services/calculator-engine.service';
-import { SeoService } from '../../services/seo.service';
 import { INVESTED_COLOR, RETURNS_COLOR, RETURNS_TEXT, doublingYears } from '../../shared/growth';
 import { AdSlotComponent } from '../../components/ad-slot.component';
+import { FaqComponent } from '../../components/faq.component';
 
 @Component({
   selector: 'app-cagr',
   standalone: true,
-  imports: [AdSlotComponent, CommonModule, SliderInputComponent, ResultCardComponent, SplitSummaryComponent, ChartCardComponent, InsightComponent, CountUpComponent],
+  imports: [AdSlotComponent, FaqComponent, CommonModule, SliderInputComponent, ResultCardComponent, SplitSummaryComponent, ChartCardComponent, InsightComponent, CountUpComponent],
   template: `
     <div class="flex flex-col lg:flex-row gap-8">
       <!-- Input Section -->
       <div class="w-full lg:w-1/2 p-6 bg-white rounded-xl shadow-sm border border-slate-100">
-        <h2 class="text-2xl font-bold text-slate-800 mb-1">CAGR Calculator</h2>
+        <h1 class="text-2xl font-bold text-slate-800 mb-1">CAGR Calculator</h1>
         <p class="text-sm text-slate-500 mb-6">Find the steady yearly growth rate between a starting and an ending value.</p>
 
         <app-slider-input
@@ -85,13 +85,8 @@ import { AdSlotComponent } from '../../components/ad-slot.component';
     <!-- In-content ad, after the results and before the FAQ -->
     <app-ad-slot placement="inContent" class="block mt-12" />
 
-    <!-- SEO FAQ Section -->
-    <div class="mt-12 p-8 bg-white rounded-xl shadow-sm border border-slate-100">
-      <h3 class="text-xl font-bold text-slate-800 mb-4">What is CAGR?</h3>
-      <p class="text-slate-600 mb-4 text-sm leading-relaxed">
-        CAGR stands for Compound Annual Growth Rate. It is the measure of an investment's annual growth rate over time, with the effect of compounding taken into account. It is often used to measure and compare the past performance of investments or to project their expected future returns.
-      </p>
-    </div>
+    <!-- FAQs (text lives in shared/seo-content.ts) -->
+    <app-faq page="/cagr" />
   `
 })
 export class CagrComponent implements OnInit {
@@ -108,16 +103,10 @@ export class CagrComponent implements OnInit {
   chartSeries: ChartSeries[] = [];
 
   constructor(
-    private calculator: CalculatorEngineService,
-    private seo: SeoService
+    private calculator: CalculatorEngineService
   ) {}
 
   ngOnInit() {
-    this.seo.updateSeoTags(
-      'CAGR Calculator',
-      'Calculate the Compound Annual Growth Rate of your investments over a specific period of time.',
-      'CAGR calculator, annual growth rate, investment return calculator'
-    );
     this.calculate();
   }
 

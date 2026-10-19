@@ -7,19 +7,19 @@ import { SplitSummaryComponent, SplitPart } from '../../components/split-summary
 import { InsightComponent } from '../../components/insight.component';
 import { CountUpComponent } from '../../components/count-up.component';
 import { CalculatorEngineService, IncomeTaxBreakdown, TaxRegime } from '../../services/calculator-engine.service';
-import { SeoService } from '../../services/seo.service';
 import { formatIndian, formatCompact } from '../../shared/format';
 import { AdSlotComponent } from '../../components/ad-slot.component';
+import { FaqComponent } from '../../components/faq.component';
 
 @Component({
   selector: 'app-tax',
   standalone: true,
-  imports: [AdSlotComponent, CommonModule, SliderInputComponent, ResultCardComponent, SegmentedControlComponent, SplitSummaryComponent, InsightComponent, CountUpComponent],
+  imports: [AdSlotComponent, FaqComponent, CommonModule, SliderInputComponent, ResultCardComponent, SegmentedControlComponent, SplitSummaryComponent, InsightComponent, CountUpComponent],
   template: `
     <div class="flex flex-col lg:flex-row gap-8">
       <!-- Input Section -->
       <div class="w-full lg:w-1/2 p-6 bg-white rounded-xl shadow-sm border border-slate-100">
-        <h2 class="text-2xl font-bold text-slate-800 mb-1">Income Tax Calculator</h2>
+        <h1 class="text-2xl font-bold text-slate-800 mb-1">Income Tax Calculator</h1>
         <p class="text-sm text-slate-500 mb-6">FY 2026-27 rules for resident salaried individuals below 60.</p>
 
         <app-segmented-control
@@ -126,19 +126,8 @@ import { AdSlotComponent } from '../../components/ad-slot.component';
     <!-- In-content ad, after the results and before the FAQ -->
     <app-ad-slot placement="inContent" class="block mt-12" />
 
-    <!-- SEO FAQ Section -->
-    <div class="mt-12 p-8 bg-white rounded-xl shadow-sm border border-slate-100">
-      <h3 class="text-xl font-bold text-slate-800 mb-4">How is Income Tax Calculated?</h3>
-      <p class="text-slate-600 mb-4 text-sm leading-relaxed">
-        Under the <strong>new regime</strong> (the default), salaried individuals get a ₹75,000 standard deduction and income is taxed at 0% up to ₹4 lakh, 5% up to ₹8 lakh, 10% up to ₹12 lakh, 15% up to ₹16 lakh, 20% up to ₹20 lakh, 25% up to ₹24 lakh and 30% above. A rebate under Section 87A makes taxable income up to ₹12 lakh tax-free, so a salary up to ₹12.75 lakh pays no tax.
-      </p>
-      <p class="text-slate-600 mb-4 text-sm leading-relaxed">
-        The <strong>old regime</strong> allows deductions such as 80C, 80D and HRA, with a ₹50,000 standard deduction and slabs of 0% up to ₹2.5 lakh, 5% up to ₹5 lakh, 20% up to ₹10 lakh and 30% above. Taxable income up to ₹5 lakh is tax-free after the 87A rebate.
-      </p>
-      <p class="text-slate-600 text-sm leading-relaxed">
-        In both regimes a surcharge applies above ₹50 lakh, and a 4% health and education cess is added to the final tax.
-      </p>
-    </div>
+    <!-- FAQs (text lives in shared/seo-content.ts) -->
+    <app-faq page="/tax" />
   `
 })
 export class TaxComponent implements OnInit {
@@ -153,8 +142,7 @@ export class TaxComponent implements OnInit {
   readonly Math = Math;
 
   constructor(
-    private calculator: CalculatorEngineService,
-    private seo: SeoService
+    private calculator: CalculatorEngineService
   ) {
     // Calculate up front so the template always has a result, even when the view
     // is rendered before ngOnInit (e.g. when the dev server hot-swaps components).
@@ -171,11 +159,6 @@ export class TaxComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.seo.updateSeoTags(
-      'Income Tax Calculator',
-      'Calculate your income tax for FY 2026-27 under the new and old tax regimes, including standard deduction, 87A rebate, surcharge and cess.',
-      'Income tax calculator, new tax regime calculator, old vs new regime, salary tax India'
-    );
   }
 
   setRegime(regime: TaxRegime) {

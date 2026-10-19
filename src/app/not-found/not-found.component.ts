@@ -1,7 +1,5 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { Meta } from '@angular/platform-browser';
-import { SeoService } from '../services/seo.service';
 import { CALCULATORS, CATEGORY_LABELS } from '../shared/calculators';
 
 @Component({
@@ -29,21 +27,9 @@ import { CALCULATORS, CATEGORY_LABELS } from '../shared/calculators';
     </div>
   `
 })
-export class NotFoundComponent implements OnInit, OnDestroy {
+export class NotFoundComponent {
   readonly groups = (Object.keys(CATEGORY_LABELS) as (keyof typeof CATEGORY_LABELS)[]).map(category => ({
     label: CATEGORY_LABELS[category],
     items: CALCULATORS.filter(c => c.category === category)
   }));
-
-  constructor(private seo: SeoService, private meta: Meta) {}
-
-  ngOnInit() {
-    this.seo.updateSeoTags('Page Not Found', 'This page does not exist. Browse all FinCalcPro calculators.', '');
-    this.meta.updateTag({ name: 'robots', content: 'noindex' });
-  }
-
-  // Calculator pages don't set robots, so remove it before navigating to one
-  ngOnDestroy() {
-    this.meta.removeTag('name="robots"');
-  }
 }

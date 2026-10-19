@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://fincalcpro-tau.vercel.app/sitemap.xml

@@ -6,19 +6,19 @@ import { SplitSummaryComponent, SplitPart } from '../../components/split-summary
 import { InsightComponent } from '../../components/insight.component';
 import { CountUpComponent } from '../../components/count-up.component';
 import { CalculatorEngineService } from '../../services/calculator-engine.service';
-import { SeoService } from '../../services/seo.service';
 import { formatIndian } from '../../shared/format';
 import { AdSlotComponent } from '../../components/ad-slot.component';
+import { FaqComponent } from '../../components/faq.component';
 
 @Component({
   selector: 'app-take-home',
   standalone: true,
-  imports: [AdSlotComponent, CommonModule, SliderInputComponent, ResultCardComponent, SplitSummaryComponent, InsightComponent, CountUpComponent],
+  imports: [AdSlotComponent, FaqComponent, CommonModule, SliderInputComponent, ResultCardComponent, SplitSummaryComponent, InsightComponent, CountUpComponent],
   template: `
     <div class="flex flex-col lg:flex-row gap-8">
       <!-- Input Section -->
       <div class="w-full lg:w-1/2 p-6 bg-white rounded-xl shadow-sm border border-slate-100">
-        <h2 class="text-2xl font-bold text-slate-800 mb-1">Salary Take-home Calculator</h2>
+        <h1 class="text-2xl font-bold text-slate-800 mb-1">Salary Take-home Calculator</h1>
         <p class="text-sm text-slate-500 mb-6">Find your monthly in-hand pay after income tax (new regime, FY 2026-27) and deductions.</p>
 
         <app-slider-input
@@ -65,13 +65,8 @@ import { AdSlotComponent } from '../../components/ad-slot.component';
     <!-- In-content ad, after the results and before the FAQ -->
     <app-ad-slot placement="inContent" class="block mt-12" />
 
-    <!-- SEO FAQ Section -->
-    <div class="mt-12 p-8 bg-white rounded-xl shadow-sm border border-slate-100">
-      <h3 class="text-xl font-bold text-slate-800 mb-4">How is in-hand salary calculated?</h3>
-      <p class="text-slate-600 text-sm leading-relaxed">
-        In-hand salary is your CTC minus income tax and deductions such as your provident fund (PF) contribution and insurance premiums, divided by 12. Tax here follows the new regime, the default for FY 2026-27: with the ₹75,000 standard deduction and the Section 87A rebate, a salary up to ₹12.75 lakh pays no income tax.
-      </p>
-    </div>
+    <!-- FAQs (text lives in shared/seo-content.ts) -->
+    <app-faq page="/take-home" />
   `
 })
 export class TakeHomeComponent implements OnInit {
@@ -87,16 +82,10 @@ export class TakeHomeComponent implements OnInit {
   readonly Math = Math;
 
   constructor(
-    private calculator: CalculatorEngineService,
-    private seo: SeoService
+    private calculator: CalculatorEngineService
   ) {}
 
   ngOnInit() {
-    this.seo.updateSeoTags(
-      'Salary Take-home Calculator',
-      'Calculate your in-hand net monthly salary after standard deductions and income tax estimation.',
-      'Take home salary calculator, net pay calculator, in-hand salary'
-    );
     this.calculate();
   }
 
