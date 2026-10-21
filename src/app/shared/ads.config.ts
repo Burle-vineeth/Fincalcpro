@@ -2,7 +2,7 @@
 // AdSense account (Ads > By ad unit), and update public/ads.txt to match.
 // While the publisher ID is still a placeholder, no ad code is loaded: dev builds
 // show grey boxes where ads will go, production builds show nothing.
-export const ADSENSE_CLIENT = 'ca-pub-XXXXXXXXXXXXXXXX';
+export const ADSENSE_CLIENT = 'ca-pub-5829208181161018';
 
 export type AdPlacement = 'top' | 'sidebar' | 'inContent';
 
@@ -15,4 +15,4 @@ export const AD_SLOTS: Record<AdPlacement, string> = {
 export const ADS_ENABLED = /^ca-pub-\d{16}$/.test(ADSENSE_CLIENT);
 
 // Shown on the Privacy Policy page, which AdSense requires
-export const CONTACT_EMAIL = 'contact@example.com';
+export const CONTACT_EMAIL = 'vineethburle@gmail.com';
