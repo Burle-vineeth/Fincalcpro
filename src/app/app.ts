@@ -33,7 +33,7 @@ export class App {
   private firstNavDone = false;
   
   constructor(private router: Router, ads: AdsService, seo: SeoService) {
-    ads.addVerificationTag();
+    ads.addHeadTags();
     this.router.events.subscribe(event => {
       // @ts-ignore
       if (event instanceof NavigationEnd || event?.type === 1 || event?.constructor?.name === 'NavigationEnd') {
