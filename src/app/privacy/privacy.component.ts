@@ -35,6 +35,13 @@ import { CONTACT_EMAIL } from '../shared/ads.config';
         ads are shown, and can change their choice at any time.
       </p>
 
+      <h2 class="text-base font-bold text-slate-800 pt-2">Visitor statistics</h2>
+      <p>
+        We use Vercel Web Analytics to count visits. It records the pages you view, the site that referred you,
+        and your browser, operating system, device type and country. It uses no cookies and does not identify you
+        personally.
+      </p>
+
       <h2 class="text-base font-bold text-slate-800 pt-2">Contact</h2>
       <p>
         Questions about this policy? Email
@@ -45,5 +52,5 @@ import { CONTACT_EMAIL } from '../shared/ads.config';
 })
 export class PrivacyComponent {
   readonly contactEmail = CONTACT_EMAIL;
-  readonly lastUpdated = '19 October 2026';
+  readonly lastUpdated = '22 October 2026';
 }
